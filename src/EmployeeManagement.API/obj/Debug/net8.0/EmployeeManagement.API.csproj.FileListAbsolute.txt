@@ -69,3 +69,4 @@ D:\Programming\C#\ASP.NET Core\ASP.NET Core Web API Bootcamp\EmployeeManagement\
 D:\Programming\C#\ASP.NET Core\ASP.NET Core Web API Bootcamp\EmployeeManagement\src\EmployeeManagement.API\bin\Debug\net8.0\EmployeeManagement.Infrastructure.dll
 D:\Programming\C#\ASP.NET Core\ASP.NET Core Web API Bootcamp\EmployeeManagement\src\EmployeeManagement.API\bin\Debug\net8.0\EmployeeManagement.Infrastructure.pdb
 D:\Programming\C#\ASP.NET Core\ASP.NET Core Web API Bootcamp\EmployeeManagement\src\EmployeeManagement.API\bin\Debug\net8.0\EmployeeManagement.Common.pdb
+D:\Programming\C#\ASP.NET Core\ASP.NET Core Web API Bootcamp\EmployeeManagement\src\EmployeeManagement.API\obj\Debug\net8.0\EmployeeManagement.API.sourcelink.json

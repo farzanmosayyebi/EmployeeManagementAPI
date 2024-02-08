@@ -9,3 +9,4 @@ D:\Programming\C#\ASP.NET Core\ASP.NET Core Web API Bootcamp\EmployeeManagement\
 D:\Programming\C#\ASP.NET Core\ASP.NET Core Web API Bootcamp\EmployeeManagement\src\EmployeeManagement.Common\obj\Debug\net8.0\refint\EmployeeManagement.Common.dll
 D:\Programming\C#\ASP.NET Core\ASP.NET Core Web API Bootcamp\EmployeeManagement\src\EmployeeManagement.Common\obj\Debug\net8.0\EmployeeManagement.Common.pdb
 D:\Programming\C#\ASP.NET Core\ASP.NET Core Web API Bootcamp\EmployeeManagement\src\EmployeeManagement.Common\obj\Debug\net8.0\ref\EmployeeManagement.Common.dll
+D:\Programming\C#\ASP.NET Core\ASP.NET Core Web API Bootcamp\EmployeeManagement\src\EmployeeManagement.Common\obj\Debug\net8.0\EmployeeManagement.Common.sourcelink.json
