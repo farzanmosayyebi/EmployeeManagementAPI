@@ -1,4 +1,7 @@
 using EmployeeManagement.Infrastructure.Data;
+using EmployeeManagement.Business;
+using EmployeeManagement.Common.Interfaces;
+using EmployeeManagement.Common.Models;
 
 namespace EmployeeManagement.API;
 public class Program
@@ -9,7 +12,9 @@ public class Program
 
         // Add services to the container.
 
+        DependencyInjectionConfiguration.RegisterServices(builder.Services);
         builder.Services.AddDbContext<ApplicationDbContext>();
+        builder.Services.AddScoped<IGenericRepository<Address>, GenericRepository<Address>>();
 
         builder.Services.AddControllers();
         // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle

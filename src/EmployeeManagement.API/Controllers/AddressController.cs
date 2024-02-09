@@ -32,9 +32,9 @@ public class AddressController : ControllerBase
 
     [HttpGet]
     [Route("Get/{id}")]
-    public async Task<IActionResult> GetAddress(AddressGet addressGet)
+    public async Task<IActionResult> GetAddress(int id)
     {
-        var address = await _addressService.GetAddressAsync(addressGet);
+        var address = await _addressService.GetAddressAsync(id);
         return Ok(address);
     }
 

@@ -1,4 +1,4 @@
-﻿using EmployeeManagement.Common.Model;
+﻿using EmployeeManagement.Common.Models;
 using System.Linq.Expressions;
 
 namespace EmployeeManagement.Common.Interfaces;

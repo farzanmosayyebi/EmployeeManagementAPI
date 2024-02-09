@@ -1,4 +1,4 @@
-﻿namespace EmployeeManagement.Common.Model;
+﻿namespace EmployeeManagement.Common.Models;
 public class Job : BaseEntity
 {
     public string Name { get; set; } = default!;

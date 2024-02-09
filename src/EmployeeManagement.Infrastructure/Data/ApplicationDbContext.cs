@@ -1,7 +1,7 @@
 ﻿using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
-using EmployeeManagement.Common.Model;
+using EmployeeManagement.Common.Models;
 
 namespace EmployeeManagement.Infrastructure.Data;
 public class ApplicationDbContext : IdentityDbContext<IdentityUser, IdentityRole, string>

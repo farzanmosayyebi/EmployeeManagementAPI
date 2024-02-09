@@ -1,4 +1,4 @@
-﻿namespace EmployeeManagement.Common.Model;
+﻿namespace EmployeeManagement.Common.Models;
 public class Team : BaseEntity
 {
     public string Name { get; set; } = default!;

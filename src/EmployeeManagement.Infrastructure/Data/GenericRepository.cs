@@ -1,5 +1,5 @@
 ﻿using EmployeeManagement.Common.Interfaces;
-using EmployeeManagement.Common.Model;
+using EmployeeManagement.Common.Models;
 using Microsoft.EntityFrameworkCore;
 using System.Linq.Expressions;
 
@@ -7,7 +7,7 @@ namespace EmployeeManagement.Infrastructure.Data;
 public class GenericRepository<T> : IGenericRepository<T> where T : BaseEntity
 {
     private readonly ApplicationDbContext _context;
-    private DbSet<T> _dbSet;
+    private readonly DbSet<T> _dbSet;
 
     public GenericRepository(ApplicationDbContext context)
     {
@@ -79,10 +79,10 @@ public class GenericRepository<T> : IGenericRepository<T> where T : BaseEntity
 
     public void Update(T entity)
     {
-        if (_context.Entry(entity).State == EntityState.Detached)
-            _dbSet.Attach(entity);
+        //if (_context.Entry(entity).State == EntityState.Detached)
+        _dbSet.Attach(entity);
 
-        _dbSet.Entry(entity).State = EntityState.Modified;
+        _context.Entry(entity).State = EntityState.Modified;
         //_context.SaveChanges();
     }
     public void Delete(T entity)

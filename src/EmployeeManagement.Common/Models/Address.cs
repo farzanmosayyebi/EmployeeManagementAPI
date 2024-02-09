@@ -1,4 +1,4 @@
-﻿namespace EmployeeManagement.Common.Model;
+﻿namespace EmployeeManagement.Common.Models;
 public class Address : BaseEntity
 {
     public string Zip { get; set; } = default!;
