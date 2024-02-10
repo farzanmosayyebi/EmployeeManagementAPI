@@ -1,6 +1,6 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using EmployeeManagement.Common.Interfaces;
-using EmployeeManagement.Common.DTOs;
+using EmployeeManagement.Common.DTOs.Address;
 
 namespace EmployeeManagement.API.Controllers;
 
@@ -22,14 +22,6 @@ public class AddressController : ControllerBase
         return Ok(id);
     }
 
-    [HttpPut]
-    [Route("Update")]
-    public async Task<IActionResult> UpdateAddress(AddressUpdate addressUpdate)
-    {
-        await _addressService.UpdateAddressAsync(addressUpdate);
-        return Ok();
-    }
-
     [HttpGet]
     [Route("Get/{id}")]
     public async Task<IActionResult> GetAddress(int id)
@@ -46,6 +38,14 @@ public class AddressController : ControllerBase
         return Ok(addresses);
     }
 
+    [HttpPut]
+    [Route("Update")]
+    public async Task<IActionResult> UpdateAddress(AddressUpdate addressUpdate)
+    {
+        await _addressService.UpdateAddressAsync(addressUpdate);
+        return Ok();
+    }
+    
     [HttpDelete]
     [Route("Delete")]
     public async Task<IActionResult> DeleteAddress(AddressDelete addressDelete)
