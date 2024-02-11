@@ -3,6 +3,7 @@ using EmployeeManagement.Common.Models;
 using EmployeeManagement.Common.DTOs.Address;
 using EmployeeManagement.Common.DTOs.Job;
 using EmployeeManagement.Common.DTOs.Employee;
+using EmployeeManagement.Common.DTOs.Team;
 
 namespace EmployeeManagement.Business;
 
@@ -34,7 +35,14 @@ public class DtoEntityMapperProfile : Profile
             .ForMember(e => e.Address, opt => opt.Ignore())
             .ForMember(e => e.Job, opt => opt.Ignore());
 
-        CreateMap<Employee, EmployeeList>();    
+        CreateMap<Employee, EmployeeList>();
 
+        CreateMap<TeamCreate, Team>()
+            .ForMember(t => t.Id, opt => opt.Ignore())
+            .ForMember(t => t.Employees, opt => opt.Ignore());
+
+        CreateMap<TeamUpdate, Team>();
+
+        CreateMap<Team, TeamGet>();
     }
 }
