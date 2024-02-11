@@ -1,3 +1,5 @@
-﻿namespace EmployeeManagement.Common.DTOs.Team;
+﻿using EmployeeManagement.Common.DTOs.Employee;
 
-public record TeamGet();
+namespace EmployeeManagement.Common.DTOs.Team;
+
+public record TeamGet(int Id, string Name, List<EmployeeList> Employees);
