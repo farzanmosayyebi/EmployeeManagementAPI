@@ -1,7 +1,9 @@
 ﻿using AutoMapper;
+using EmployeeManagement.Business.Validation.Job;
 using EmployeeManagement.Common.DTOs.Job;
 using EmployeeManagement.Common.Interfaces;
 using EmployeeManagement.Common.Models;
+using FluentValidation;
 
 namespace EmployeeManagement.Business.Services
 {
@@ -9,13 +11,20 @@ namespace EmployeeManagement.Business.Services
     {
         private readonly IGenericRepository<Job> _repository;
         private readonly IMapper _mapper;
-        public JobService(IGenericRepository<Job> genericRepository, IMapper mapper)
+        private readonly JobCreateValidator _createValidator;
+        private readonly JobUpdateValidator _updateValidator;
+
+        public JobService(IGenericRepository<Job> genericRepository, IMapper mapper, JobCreateValidator createValidator, JobUpdateValidator updateValidator)
         {
             _repository = genericRepository;
             _mapper = mapper;
+            _createValidator = createValidator;
+            _updateValidator = updateValidator;
         }
         public async Task<int> CreateJobAsync(JobCreate jobCreate)
         {
+            await _createValidator.ValidateAndThrowAsync(jobCreate);
+
             var entity = _mapper.Map<Job>(jobCreate);
 
             await _repository.InsertAsync(entity);
@@ -47,6 +56,8 @@ namespace EmployeeManagement.Business.Services
 
         public async Task UpdateJobAsync(JobUpdate jobUpdate)
         {
+            await _updateValidator.ValidateAndThrowAsync(jobUpdate);
+
             var entity = _mapper.Map<Job>(jobUpdate);
 
             _repository.Update(entity);

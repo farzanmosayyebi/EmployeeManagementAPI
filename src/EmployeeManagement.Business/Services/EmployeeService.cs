@@ -1,7 +1,9 @@
 ﻿using AutoMapper;
+using EmployeeManagement.Business.Validation.Employee;
 using EmployeeManagement.Common.DTOs.Employee;
 using EmployeeManagement.Common.Interfaces;
 using EmployeeManagement.Common.Models;
+using FluentValidation;
 using System.Linq.Expressions;
 
 namespace EmployeeManagement.Business.Services;
@@ -13,16 +15,25 @@ public class EmployeeService : IEmployeeService
     private readonly IGenericRepository<Job> _jobRepository;
     private readonly IMapper _mapper;
 
-    public EmployeeService(IGenericRepository<Employee> employeeRepository, IGenericRepository<Address> addressrepository, IGenericRepository<Job> jobRepository, IMapper mapper)
+    private readonly EmployeeCreateValidator _createValidator;
+    private readonly EmployeeUpdateValidator _updateValidator;
+    private readonly EmployeeFilterValidator _filterValidator;
+
+    public EmployeeService(IGenericRepository<Employee> employeeRepository, IGenericRepository<Address> addressrepository, IGenericRepository<Job> jobRepository, IMapper mapper
+                           , EmployeeCreateValidator createValidator, EmployeeUpdateValidator updateValidator, EmployeeFilterValidator filterValidator)
     {
         _employeeRepository = employeeRepository;
         _addressRepository = addressrepository;
         _jobRepository = jobRepository;
         _mapper = mapper;
+        _createValidator = createValidator;
+        _updateValidator = updateValidator;
     }
 
     public async Task<int> CreateEmployeeAsync(EmployeeCreate employeeCreate)
     {
+        await _createValidator.ValidateAndThrowAsync(employeeCreate);
+
         var entity = _mapper.Map<Employee>(employeeCreate);
 
         var address = await _addressRepository.GetByIdAsync(employeeCreate.AddresId);
@@ -46,6 +57,8 @@ public class EmployeeService : IEmployeeService
 
     public async Task<List<EmployeeList>> FilterEmployeesAsync(EmployeeFilter employeeFilter)
     {
+        await _filterValidator.ValidateAndThrowAsync(employeeFilter);
+
         Expression<Func<Employee, bool>> firstNameFilter = employee => employeeFilter.FirstName == null ? true
             : employee.FirstName.StartsWith(employeeFilter.FirstName);
 
@@ -76,6 +89,8 @@ public class EmployeeService : IEmployeeService
 
     public async Task UpdateEmployeeAsync(EmployeeUpdate employeeUpdate)
     {
+        await _updateValidator.ValidateAndThrowAsync(employeeUpdate);
+
         var entity = _mapper.Map<Employee>(employeeUpdate);
 
         _employeeRepository.Update(entity);

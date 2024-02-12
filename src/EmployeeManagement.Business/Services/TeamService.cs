@@ -1,8 +1,10 @@
 ﻿using AutoMapper;
+using EmployeeManagement.Business.Validation.Team;
 using EmployeeManagement.Common.DTOs.Employee;
 using EmployeeManagement.Common.DTOs.Team;
 using EmployeeManagement.Common.Interfaces;
 using EmployeeManagement.Common.Models;
+using FluentValidation;
 using System.Linq.Expressions;
 
 namespace EmployeeManagement.Business.Services;
@@ -13,15 +15,26 @@ internal class TeamService : ITeamService
     private readonly IGenericRepository<Employee> _employeeRepository;
     private readonly IMapper _mapper;
 
-    public TeamService(IGenericRepository<Team> teamRepository, IGenericRepository<Employee> employeeRepository, IMapper mapper)
+    private readonly TeamCreateValidator _createValidator;
+    private readonly TeamUpdateValidator _updateValidator;
+    private readonly TeamFilterValidator _filterValidator;
+
+    public TeamService(IGenericRepository<Team> teamRepository, IGenericRepository<Employee> employeeRepository, IMapper mapper,
+                        TeamCreateValidator createValidator, TeamUpdateValidator updateValidator, TeamFilterValidator filterValidator)
     {
         _teamRepository = teamRepository;
         _employeeRepository = employeeRepository;
         _mapper = mapper;
+
+        _createValidator = createValidator;
+        _updateValidator = updateValidator;
+        _filterValidator = filterValidator;
     }
 
     public async Task<int> CreateTeamAsync(TeamCreate teamCreate)
     {
+        await _createValidator.ValidateAndThrowAsync(teamCreate);
+
         Team team = _mapper.Map<Team>(teamCreate);
         int id = await _teamRepository.InsertAsync(team);
         await _teamRepository.SaveChangesAsync();
@@ -53,6 +66,8 @@ internal class TeamService : ITeamService
 
     public async Task<List<TeamGet>> FilterTeamsAsync(TeamFilter teamFilter)
     {
+        await _filterValidator.ValidateAndThrowAsync(teamFilter);
+
         Expression<Func<Team, bool>> nameFilter = t => teamFilter.Name == null ? true
             : t.Name.StartsWith(teamFilter.Name);
         
@@ -87,6 +102,8 @@ internal class TeamService : ITeamService
 
     public async Task UpdateTeamAsync(TeamUpdate teamUpdate)
     {
+        await _updateValidator.ValidateAndThrowAsync(teamUpdate);
+
         Team team = _mapper.Map<Team>(teamUpdate);
 
         _teamRepository.Update(team);

@@ -74,3 +74,4 @@ D:\Programming\C#\ASP.NET Core\ASP.NET Core Web API Bootcamp\EmployeeManagement\
 D:\Programming\C#\ASP.NET Core\ASP.NET Core Web API Bootcamp\EmployeeManagement\src\EmployeeManagement.API\bin\Debug\net8.0\AutoMapper.Extensions.Microsoft.DependencyInjection.dll
 D:\Programming\C#\ASP.NET Core\ASP.NET Core Web API Bootcamp\EmployeeManagement\src\EmployeeManagement.API\bin\Debug\net8.0\EmployeeManagement.Business.dll
 D:\Programming\C#\ASP.NET Core\ASP.NET Core Web API Bootcamp\EmployeeManagement\src\EmployeeManagement.API\bin\Debug\net8.0\EmployeeManagement.Business.pdb
+D:\Programming\C#\ASP.NET Core\ASP.NET Core Web API Bootcamp\EmployeeManagement\src\EmployeeManagement.API\bin\Debug\net8.0\FluentValidation.dll

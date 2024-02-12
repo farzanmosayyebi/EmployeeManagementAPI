@@ -41,6 +41,8 @@ public class Program
             dbContext.Database.EnsureCreated();
         }
 
+        app.UseMiddleware<ExceptionMiddleware>();
+
         app.UseHttpsRedirection();
 
         app.UseAuthorization();
