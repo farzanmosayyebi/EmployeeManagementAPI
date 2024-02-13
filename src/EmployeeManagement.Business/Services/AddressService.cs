@@ -1,9 +1,11 @@
 ﻿using AutoMapper;
+using EmployeeManagement.Business.Exceptions;
 using EmployeeManagement.Business.Validation.Address;
 using EmployeeManagement.Common.DTOs.Address;
 using EmployeeManagement.Common.Interfaces;
 using EmployeeManagement.Common.Models;
 using FluentValidation;
+using System.Runtime.Loader;
 
 namespace EmployeeManagement.Business.Services;
 
@@ -37,7 +39,13 @@ public class AddressService : IAddressService
 
     public async Task DeleteAddressAsync(AddressDelete addressDelete)
     {
-        var entity = await _repository.GetByIdAsync(addressDelete.Id);
+        var entity = await _repository.GetByIdAsync(addressDelete.Id, address => address.Employees);
+
+        if (entity == null)
+            throw new AddressNotFoundException(addressDelete.Id);
+
+        if (entity.Employees.Count > 0)
+            throw new DependentEmployeesExistException(entity.Employees);
 
         _repository.Delete(entity);
         await _repository.SaveChangesAsync();
@@ -46,6 +54,9 @@ public class AddressService : IAddressService
     public async Task<AddressGet> GetAddressAsync(int id)
     {
         var entity = await _repository.GetByIdAsync(id);
+
+        if (entity == null)
+            throw new AddressNotFoundException(id);
 
         var addressGet = _mapper.Map<AddressGet>(entity);
         
@@ -66,7 +77,11 @@ public class AddressService : IAddressService
     {
         await _addressUpdateValidator.ValidateAndThrowAsync(addressUpdate);
 
-        //var entity = await _repository.GetByIdAsync(addressUpdate.Id);
+        var existingEntity = await _repository.GetByIdAsync(addressUpdate.Id);
+        if (existingEntity == null)
+        {
+            throw new AddressNotFoundException(addressUpdate.Id);
+        }
         var entity = _mapper.Map<Address>(addressUpdate);
 
         _repository.Update(entity);
