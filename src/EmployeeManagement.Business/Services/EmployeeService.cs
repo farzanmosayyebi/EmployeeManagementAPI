@@ -28,6 +28,7 @@ public class EmployeeService : IEmployeeService
         _mapper = mapper;
         _createValidator = createValidator;
         _updateValidator = updateValidator;
+        _filterValidator = filterValidator;
     }
 
     public async Task<int> CreateEmployeeAsync(EmployeeCreate employeeCreate)
