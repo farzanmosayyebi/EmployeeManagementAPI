@@ -36,25 +36,25 @@ internal class TeamService : ITeamService
         await _createValidator.ValidateAndThrowAsync(teamCreate);
 
         Team team = _mapper.Map<Team>(teamCreate);
-        int id = await _teamRepository.InsertAsync(team);
+        await _teamRepository.InsertAsync(team);
         await _teamRepository.SaveChangesAsync();
-        return id;
+        return team.Id;
     }
 
-    public async Task AddEmployeesAsync(int teamId, List<int> employeeIds)
+    public async Task AddEmployeeAsync(int teamId, int employeeId)
     {
-        Expression<Func<Employee, bool>> employeeFilter = employee => employeeIds.Contains(employee.Id);
-
         Team team = await _teamRepository.GetByIdAsync(teamId, t => t.Employees)
             ?? throw new ItemNotFoundException(typeof(Team), teamId);
 
+        if (team.Employees.Any(e => e.Id == employeeId))
+            throw new InvalidAddOperationException(typeof(Employee), employeeId);
 
-        List<Employee> employeeEntities = await _employeeRepository.GetFilteredAsync([employeeFilter], null, null);
-        //employeeIds.ForEach(async id => employeeEntities.Add(await _employeeRepository.GetByIdAsync(id)));
+        Employee employee = await _employeeRepository.GetByIdAsync(employeeId)
+            ?? throw new ItemNotFoundException(typeof(Employee), employeeId);
 
-        team.Employees.AddRange(employeeEntities);
+        team.Employees.Add(employee);
+
         _teamRepository.Update(team);
-        
         await _teamRepository.SaveChangesAsync();
     }
 
@@ -95,15 +95,18 @@ internal class TeamService : ITeamService
         return _mapper.Map<TeamGet>(team);
     }
 
-    public async Task RemoveEmployeesAsync(int teamId, List<int> employeeIds)
+    public async Task RemoveEmployeeAsync(int teamId, int employeeId)
     {
-        Expression<Func<Employee, bool>> employeeFilter = employee => employeeIds.Contains(employee.Id);
-
         Team team = await _teamRepository.GetByIdAsync(teamId, t => t.Employees)
             ?? throw new ItemNotFoundException(typeof(Team), teamId);
 
-        List<Employee> employeeEntities = await _employeeRepository.GetFilteredAsync([employeeFilter], null, null);
-        employeeEntities.ForEach(e => team.Employees.Remove(e));
+        if (!team.Employees.Any(e => e.Id == employeeId))
+            throw new InvalidRemoveOperationException(typeof(Employee), employeeId);
+
+        Employee employee = await _employeeRepository.GetByIdAsync(employeeId)
+            ?? throw new ItemNotFoundException(typeof(Employee), employeeId);
+
+        team.Employees.Remove(employee);
 
         _teamRepository.Update(team);
         await _teamRepository.SaveChangesAsync();

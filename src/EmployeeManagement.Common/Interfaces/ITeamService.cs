@@ -8,8 +8,8 @@ public interface ITeamService
     Task<int> CreateTeamAsync(TeamCreate teamCreate);
     Task<TeamGet> GetTeamAsync(int Id);
     Task<List<TeamGet>> FilterTeamsAsync(TeamFilter teamFilter);
-    Task AddEmployeesAsync(int teamId, List<int> employeeIds);
-    Task RemoveEmployeesAsync(int teamId, List<int> employeeIds);
+    Task AddEmployeeAsync(int teamId, int employeeId);
+    Task RemoveEmployeeAsync(int teamId, int employeeId);
     Task UpdateTeamAsync(TeamUpdate teamUpdate);
     Task DeleteTeamAsync(TeamDelete teamDelete);
 }

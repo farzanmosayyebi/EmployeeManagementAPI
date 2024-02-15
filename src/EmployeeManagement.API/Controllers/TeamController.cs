@@ -50,17 +50,17 @@ public class TeamController : ControllerBase
 
     [HttpPut]
     [Route("Update/Add")]
-    public async Task<IActionResult> AddEmployee(int teamId, List<int> employeeIds)
+    public async Task<IActionResult> AddEmployee(int teamId, int employeeId)
     {
-        await _teamService.AddEmployeesAsync(teamId, employeeIds);
+        await _teamService.AddEmployeeAsync(teamId, employeeId);
         return Ok();
     }
 
     [HttpPut]
     [Route("Update/Remove")]
-    public async Task<IActionResult> RemoveEmployees(int teamId, List<int> employeeIds)
+    public async Task<IActionResult> RemoveEmployee(int teamId, int employeeId)
     {
-        await _teamService.RemoveEmployeesAsync(teamId, employeeIds);
+        await _teamService.RemoveEmployeeAsync(teamId, employeeId);
         return Ok();
     }
 

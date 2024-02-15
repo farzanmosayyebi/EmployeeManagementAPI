@@ -21,6 +21,42 @@ public class ExceptionMiddleware
             await _next(context);
         }
 
+        catch (InvalidAddOperationException ex)
+        {
+            context.Response.ContentType = "application/problem+json";
+            context.Response.StatusCode = StatusCodes.Status400BadRequest;
+
+            var problemDetails = new ProblemDetails()
+            {
+                Status = StatusCodes.Status400BadRequest,
+                Detail = ex.Message,
+                Instance = "",
+                Title = $"The item with the id {ex.ItemId} already exists.",
+                Type = "Error"
+            };
+
+            var problemDetailsJson = JsonSerializer.Serialize(problemDetails);
+            await context.Response.WriteAsync(problemDetailsJson);
+        }
+
+        catch (InvalidRemoveOperationException ex)
+        {
+            context.Response.ContentType = "application/problem+json";
+            context.Response.StatusCode = StatusCodes.Status400BadRequest;
+
+            var problemDetails = new ProblemDetails()
+            {
+                Status = StatusCodes.Status400BadRequest,
+                Detail = ex.Message,
+                Instance = "",
+                Title = $"The item with the id {ex.ItemId} does not exist.",
+                Type = "Error"
+            };
+
+            var problemDetailsJson = JsonSerializer.Serialize(problemDetails);
+            await context.Response.WriteAsync(problemDetailsJson);
+        }
+
         catch (ItemNotFoundException ex)
         {
             context.Response.ContentType = "application/problem+json";
@@ -31,31 +67,13 @@ public class ExceptionMiddleware
                 Status = StatusCodes.Status400BadRequest,
                 Detail = ex.Message,
                 Instance = "",
-                Title = $"{ex.ItemType.Name} with id {ex.ItemId} not found.",
+                Title = $"The item of the type <{ex.ItemType.Name}> with the id {ex.ItemId} could not be found.",
                 Type = "Error"
             };
 
             var problemDetailsJson = JsonSerializer.Serialize(problemDetails);
             await context.Response.WriteAsync(problemDetailsJson);
         }
-
-        //catch (JobNotFoundException ex)
-        //{
-        //    context.Response.ContentType = "application/problem+json";
-        //    context.Response.StatusCode = StatusCodes.Status400BadRequest;
-
-        //    var problemDetails = new ProblemDetails()
-        //    {
-        //        Status = StatusCodes.Status400BadRequest,
-        //        Detail = ex.Message,
-        //        Instance = "",
-        //        Title = $"Job with id {ex.Id} not found.",
-        //        Type = "Error"
-        //    };
-
-        //    var problemDetailsJson = JsonSerializer.Serialize(problemDetails);
-        //    await context.Response.WriteAsync(problemDetailsJson);
-        //}
 
         catch (DependentEmployeesExistException ex)
         {
@@ -74,24 +92,6 @@ public class ExceptionMiddleware
             var problemDetailsJson = JsonSerializer.Serialize(problemDetails);
             await context.Response.WriteAsync(problemDetailsJson);
         }
-
-        //catch (AddressNotFoundException ex)
-        //{
-        //    context.Response.ContentType = "application/problem+json";
-        //    context.Response.StatusCode = StatusCodes.Status400BadRequest;
-
-        //    var problemDetails = new ProblemDetails()
-        //    {
-        //        Status = StatusCodes.Status400BadRequest,
-        //        Detail = ex.Message,
-        //        Instance = "",
-        //        Title = $"Address with id {ex.Id} not found.",
-        //        Type = "Error"
-        //    };
-
-        //    var problemDetailsJson = JsonSerializer.Serialize(problemDetails);
-        //    await context.Response.WriteAsync(problemDetailsJson);
-        //}
 
         catch (ValidationException ex)
         {
