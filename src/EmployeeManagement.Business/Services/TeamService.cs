@@ -1,6 +1,6 @@
 ﻿using AutoMapper;
+using EmployeeManagement.Business.Exceptions;
 using EmployeeManagement.Business.Validation.Team;
-using EmployeeManagement.Common.DTOs.Employee;
 using EmployeeManagement.Common.DTOs.Team;
 using EmployeeManagement.Common.Interfaces;
 using EmployeeManagement.Common.Models;
@@ -45,7 +45,8 @@ internal class TeamService : ITeamService
     {
         Expression<Func<Employee, bool>> employeeFilter = employee => employeeIds.Contains(employee.Id);
 
-        Team team = await _teamRepository.GetByIdAsync(teamId, t => t.Employees);
+        Team team = await _teamRepository.GetByIdAsync(teamId, t => t.Employees)
+            ?? throw new ItemNotFoundException(typeof(Team), teamId);
 
 
         List<Employee> employeeEntities = await _employeeRepository.GetFilteredAsync([employeeFilter], null, null);
@@ -59,7 +60,12 @@ internal class TeamService : ITeamService
 
     public async Task DeleteTeamAsync(TeamDelete teamDelete)
     {
-        Team team = await _teamRepository.GetByIdAsync(teamDelete.Id);
+        Team team = await _teamRepository.GetByIdAsync(teamDelete.Id, team => team.Employees)
+            ?? throw new ItemNotFoundException(typeof(Team), teamDelete.Id);
+
+        if (team.Employees.Count > 0)
+            throw new DependentEmployeesExistException(team.Employees);
+
         _teamRepository.Delete(team);
         await _teamRepository.SaveChangesAsync();
     }
@@ -76,14 +82,15 @@ internal class TeamService : ITeamService
 
         Expression<Func<Team, bool>>[] filters = [nameFilter, employeeFilter];
 
-        List<Team> teams = await _teamRepository.GetFilteredAsync(filters, teamFilter.Skip, teamFilter.Take);
+        List<Team> teams = await _teamRepository.GetFilteredAsync(filters, teamFilter.Skip, teamFilter.Take, team => team.Employees);
 
         return _mapper.Map<List<TeamGet>>(teams);
     }
 
-    public async Task<TeamGet> GetTeamAsync(int Id)
+    public async Task<TeamGet> GetTeamAsync(int id)
     {
-        Team team = await _teamRepository.GetByIdAsync(Id, t => t.Employees);
+        Team team = await _teamRepository.GetByIdAsync(id, t => t.Employees)
+            ?? throw new ItemNotFoundException(typeof(Team), id);
         
         return _mapper.Map<TeamGet>(team);
     }
@@ -91,7 +98,9 @@ internal class TeamService : ITeamService
     public async Task RemoveEmployeesAsync(int teamId, List<int> employeeIds)
     {
         Expression<Func<Employee, bool>> employeeFilter = employee => employeeIds.Contains(employee.Id);
-        Team team = await _teamRepository.GetByIdAsync(teamId, t => t.Employees);
+
+        Team team = await _teamRepository.GetByIdAsync(teamId, t => t.Employees)
+            ?? throw new ItemNotFoundException(typeof(Team), teamId);
 
         List<Employee> employeeEntities = await _employeeRepository.GetFilteredAsync([employeeFilter], null, null);
         employeeEntities.ForEach(e => team.Employees.Remove(e));
@@ -104,9 +113,13 @@ internal class TeamService : ITeamService
     {
         await _updateValidator.ValidateAndThrowAsync(teamUpdate);
 
-        Team team = _mapper.Map<Team>(teamUpdate);
+        Team existingEntity = await _teamRepository.GetByIdAsync(teamUpdate.Id)
+            ?? throw new ItemNotFoundException(typeof(Team), teamUpdate.Id);
 
-        _teamRepository.Update(team);
+        Team entity = _mapper.Map<Team>(teamUpdate);
+        _mapper.Map(entity, existingEntity);
+
+        _teamRepository.Update(existingEntity);
         await _teamRepository.SaveChangesAsync();
     }
 }

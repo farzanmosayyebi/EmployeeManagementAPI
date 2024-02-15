@@ -1,10 +1,12 @@
 ﻿using AutoMapper;
+using EmployeeManagement.Business.Exceptions;
 using EmployeeManagement.Business.Validation.Employee;
 using EmployeeManagement.Common.DTOs.Employee;
 using EmployeeManagement.Common.Interfaces;
 using EmployeeManagement.Common.Models;
 using FluentValidation;
 using System.Linq.Expressions;
+using System.Reflection;
 
 namespace EmployeeManagement.Business.Services;
 
@@ -37,8 +39,11 @@ public class EmployeeService : IEmployeeService
 
         var entity = _mapper.Map<Employee>(employeeCreate);
 
-        var address = await _addressRepository.GetByIdAsync(employeeCreate.AddresId);
-        var job = await _jobRepository.GetByIdAsync(employeeCreate.JobId);
+        Address address = await _addressRepository.GetByIdAsync(employeeCreate.AddressId)
+            ?? throw new ItemNotFoundException(typeof(Address), employeeCreate.AddressId);
+
+        Job job = await _jobRepository.GetByIdAsync(employeeCreate.JobId)
+            ?? throw new ItemNotFoundException(typeof(Job), employeeCreate.JobId);
 
         entity.Address = address;
         entity.Job = job;
@@ -46,12 +51,14 @@ public class EmployeeService : IEmployeeService
         int id = await _employeeRepository.InsertAsync(entity);
         await _employeeRepository.SaveChangesAsync();
         
-        return id;
+        return entity.Id;
     }
 
     public async Task DeleteEmployeeAsync(EmployeeDelete employeeDelete)
     {
-        var entity = await _employeeRepository.GetByIdAsync(employeeDelete.Id);
+        var entity = await _employeeRepository.GetByIdAsync(employeeDelete.Id)
+            ?? throw new ItemNotFoundException(typeof(Employee), employeeDelete.Id);
+
         _employeeRepository.Delete(entity);
         await _employeeRepository.SaveChangesAsync();
     }
@@ -84,7 +91,9 @@ public class EmployeeService : IEmployeeService
 
     public async Task<EmployeeDetails> GetEmployeeAsync(int id)
     {
-        var entity = await _employeeRepository.GetByIdAsync(id, e => e.Address, e => e.Job, e => e.Teams);
+        var entity = await _employeeRepository.GetByIdAsync(id, e => e.Address, e => e.Job, e => e.Teams)
+            ?? throw new ItemNotFoundException(typeof(Employee), id);
+
         return _mapper.Map<EmployeeDetails>(entity);
     }
 
@@ -92,9 +101,26 @@ public class EmployeeService : IEmployeeService
     {
         await _updateValidator.ValidateAndThrowAsync(employeeUpdate);
 
-        var entity = _mapper.Map<Employee>(employeeUpdate);
+        Employee existingEntity = await _employeeRepository.GetByIdAsync(employeeUpdate.Id)
+            ?? throw new ItemNotFoundException(typeof(Employee), employeeUpdate.Id);
 
-        _employeeRepository.Update(entity);
+        Employee entity = _mapper.Map<Employee>(employeeUpdate);
+        
+        Address address = await _addressRepository.GetByIdAsync(employeeUpdate.AddressId)
+            ?? throw new ItemNotFoundException(typeof(Address), employeeUpdate.AddressId);
+
+        Job job = await _jobRepository.GetByIdAsync(employeeUpdate.JobId)
+            ?? throw new ItemNotFoundException(typeof(Job), employeeUpdate.JobId);
+
+        entity.Address = address;
+        entity.Job = job;
+
+        _mapper.Map(entity, existingEntity);
+
+        existingEntity.Address = address;
+        existingEntity.Job = job;
+
+        _employeeRepository.Update(existingEntity);
         await _employeeRepository.SaveChangesAsync();
     }
 }

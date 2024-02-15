@@ -39,10 +39,8 @@ public class AddressService : IAddressService
 
     public async Task DeleteAddressAsync(AddressDelete addressDelete)
     {
-        var entity = await _repository.GetByIdAsync(addressDelete.Id, address => address.Employees);
-
-        if (entity == null)
-            throw new AddressNotFoundException(addressDelete.Id);
+        Address entity = await _repository.GetByIdAsync(addressDelete.Id, address => address.Employees)
+            ?? throw new ItemNotFoundException(typeof(Address), addressDelete.Id);
 
         if (entity.Employees.Count > 0)
             throw new DependentEmployeesExistException(entity.Employees);
@@ -53,10 +51,8 @@ public class AddressService : IAddressService
 
     public async Task<AddressGet> GetAddressAsync(int id)
     {
-        var entity = await _repository.GetByIdAsync(id);
-
-        if (entity == null)
-            throw new AddressNotFoundException(id);
+        Address entity = await _repository.GetByIdAsync(id)
+            ?? throw new ItemNotFoundException(typeof(Address), id);
 
         var addressGet = _mapper.Map<AddressGet>(entity);
         
@@ -77,14 +73,13 @@ public class AddressService : IAddressService
     {
         await _addressUpdateValidator.ValidateAndThrowAsync(addressUpdate);
 
-        var existingEntity = await _repository.GetByIdAsync(addressUpdate.Id);
-        if (existingEntity == null)
-        {
-            throw new AddressNotFoundException(addressUpdate.Id);
-        }
-        var entity = _mapper.Map<Address>(addressUpdate);
+        Address existingEntity = await _repository.GetByIdAsync(addressUpdate.Id)
+            ?? throw new ItemNotFoundException(typeof(Address), addressUpdate.Id);
 
-        _repository.Update(entity);
+        var entity = _mapper.Map<Address>(addressUpdate);
+        _mapper.Map(entity, existingEntity);
+
+        _repository.Update(existingEntity);
         await _repository.SaveChangesAsync();
     }
 }

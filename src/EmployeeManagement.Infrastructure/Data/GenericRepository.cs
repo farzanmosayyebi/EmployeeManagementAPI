@@ -79,11 +79,11 @@ public class GenericRepository<T> : IGenericRepository<T> where T : BaseEntity
 
     public void Update(T entity)
     {
-        //if (_context.Entry(entity).State == EntityState.Detached)
-        _dbSet.Attach(entity);
+        //_context.Update(entity);
+        if (_context.Entry(entity).State == EntityState.Detached)
+            _context.Attach(entity);
 
         _context.Entry(entity).State = EntityState.Modified;
-        //_context.SaveChanges();
     }
     public void Delete(T entity)
     {

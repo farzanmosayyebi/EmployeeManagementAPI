@@ -39,15 +39,11 @@ namespace EmployeeManagement.Business.Services
 
         public async Task DeleteJobAsync(JobDelete jobDelete)
         {
-            var entity = await _jobRepository.GetByIdAsync(jobDelete.Id);
+            Job entity = await _jobRepository.GetByIdAsync(jobDelete.Id, job => job.Employees)
+                ?? throw new ItemNotFoundException(typeof(Job), jobDelete.Id);
 
-            if (entity == null)
-                throw new JobNotFoundException(jobDelete.Id);
-
-            Expression<Func<Employee, bool>> employeesWithThisJob = employee => employee.Job.Id == jobDelete.Id;
-            List<Employee> dependentEmployees = await _employeeRepository.GetFilteredAsync([employeesWithThisJob], null, null);
-            if (dependentEmployees.Count > 0)
-                throw new DependentEmployeesExistException(dependentEmployees);
+            if (entity.Employees.Count > 0)
+                throw new DependentEmployeesExistException(entity.Employees);
 
             _jobRepository.Delete(entity);
             await _jobRepository.SaveChangesAsync();
@@ -62,10 +58,8 @@ namespace EmployeeManagement.Business.Services
 
         public async Task<JobGet> GetJobAsync(int id)
         {
-            var entity = await _jobRepository.GetByIdAsync(id);
-            
-            if (entity == null)
-                throw new JobNotFoundException(id);
+            var entity = await _jobRepository.GetByIdAsync(id)
+                ?? throw new ItemNotFoundException(typeof(Job), id);
 
             return _mapper.Map<JobGet>(entity);
         }
@@ -74,13 +68,14 @@ namespace EmployeeManagement.Business.Services
         {
             await _updateValidator.ValidateAndThrowAsync(jobUpdate);
 
-            var existingEntity = await _jobRepository.GetByIdAsync(jobUpdate.Id);
-            if (existingEntity == null)
-                throw new JobNotFoundException(jobUpdate.Id);
+            Job existingEntity = await _jobRepository.GetByIdAsync(jobUpdate.Id)
+                ?? throw new ItemNotFoundException(typeof(Job), jobUpdate.Id);
 
             var entity = _mapper.Map<Job>(jobUpdate);
 
-            _jobRepository.Update(entity);
+            _mapper.Map(entity, existingEntity);
+
+            _jobRepository.Update(existingEntity);
             await _jobRepository.SaveChangesAsync();
         }
     }

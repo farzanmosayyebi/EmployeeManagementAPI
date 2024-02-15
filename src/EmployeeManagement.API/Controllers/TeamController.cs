@@ -28,7 +28,6 @@ public class TeamController : ControllerBase
     [Route("Get/{id}")]
     public async Task<IActionResult> GetTeam(int id)
     {
-        throw new Exception("Test Exception");
         var team = await _teamService.GetTeamAsync(id);
         return Ok(team);
     }

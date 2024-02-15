@@ -19,7 +19,7 @@ public class EmployeeController : ControllerBase
     [Route("Create")]
     public async Task<IActionResult> CreateEmployee(EmployeeCreate employeeCreate)
     {
-        var id = await _employeeService.CreateEmployeeAsync(employeeCreate);
+        int id = await _employeeService.CreateEmployeeAsync(employeeCreate);
         return Ok(id);
     }
 
