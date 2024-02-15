@@ -23,6 +23,7 @@ public class DtoEntityMapperProfile : Profile
 
         CreateMap<EmployeeCreate, Employee>()
             .ForMember(e => e.Id, opt => opt.Ignore())
+            .ForMember(e => e.Address, opt => opt.Ignore())
             .ForMember(e => e.Job, opt => opt.Ignore())
             .ForMember(e => e.Teams, opt => opt.Ignore());
 
@@ -44,5 +45,12 @@ public class DtoEntityMapperProfile : Profile
         CreateMap<TeamUpdate, Team>();
 
         CreateMap<Team, TeamGet>();
+
+        CreateMap<Job, Job>();
+        CreateMap<Employee, Employee>()
+            .ForMember(e => e.Address, opt => opt.Ignore())
+            .ForMember(e => e.Job, opt => opt.Ignore());
+        CreateMap<Address, Address>();
+        CreateMap<Team, Team>();
     }
 }

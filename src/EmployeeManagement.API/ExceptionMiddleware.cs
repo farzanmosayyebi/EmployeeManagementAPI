@@ -21,7 +21,7 @@ public class ExceptionMiddleware
             await _next(context);
         }
 
-        catch (JobNotFoundException ex)
+        catch (ItemNotFoundException ex)
         {
             context.Response.ContentType = "application/problem+json";
             context.Response.StatusCode = StatusCodes.Status400BadRequest;
@@ -31,13 +31,31 @@ public class ExceptionMiddleware
                 Status = StatusCodes.Status400BadRequest,
                 Detail = ex.Message,
                 Instance = "",
-                Title = $"Job with id {ex.Id} not found.",
+                Title = $"{ex.ItemType.Name} with id {ex.ItemId} not found.",
                 Type = "Error"
             };
 
             var problemDetailsJson = JsonSerializer.Serialize(problemDetails);
             await context.Response.WriteAsync(problemDetailsJson);
         }
+
+        //catch (JobNotFoundException ex)
+        //{
+        //    context.Response.ContentType = "application/problem+json";
+        //    context.Response.StatusCode = StatusCodes.Status400BadRequest;
+
+        //    var problemDetails = new ProblemDetails()
+        //    {
+        //        Status = StatusCodes.Status400BadRequest,
+        //        Detail = ex.Message,
+        //        Instance = "",
+        //        Title = $"Job with id {ex.Id} not found.",
+        //        Type = "Error"
+        //    };
+
+        //    var problemDetailsJson = JsonSerializer.Serialize(problemDetails);
+        //    await context.Response.WriteAsync(problemDetailsJson);
+        //}
 
         catch (DependentEmployeesExistException ex)
         {
@@ -47,7 +65,7 @@ public class ExceptionMiddleware
             var problemDetails = new ProblemDetails()
             {
                 Status = StatusCodes.Status400BadRequest,
-                Detail = string.Empty,
+                Detail = ex.Message,
                 Instance = "",
                 Title = $"Dependent employees {JsonSerializer.Serialize(ex.Employees.Select(e => e.Id))} exist",
                 Type = "Error"
@@ -57,23 +75,23 @@ public class ExceptionMiddleware
             await context.Response.WriteAsync(problemDetailsJson);
         }
 
-        catch (AddressNotFoundException ex)
-        {
-            context.Response.ContentType = "application/problem+json";
-            context.Response.StatusCode = StatusCodes.Status400BadRequest;
+        //catch (AddressNotFoundException ex)
+        //{
+        //    context.Response.ContentType = "application/problem+json";
+        //    context.Response.StatusCode = StatusCodes.Status400BadRequest;
 
-            var problemDetails = new ProblemDetails()
-            {
-                Status = StatusCodes.Status400BadRequest,
-                Detail = string.Empty,
-                Instance = "",
-                Title = $"Address with id {ex.Id} not found.",
-                Type = "Error"
-            };
+        //    var problemDetails = new ProblemDetails()
+        //    {
+        //        Status = StatusCodes.Status400BadRequest,
+        //        Detail = ex.Message,
+        //        Instance = "",
+        //        Title = $"Address with id {ex.Id} not found.",
+        //        Type = "Error"
+        //    };
 
-            var problemDetailsJson = JsonSerializer.Serialize(problemDetails);
-            await context.Response.WriteAsync(problemDetailsJson);
-        }
+        //    var problemDetailsJson = JsonSerializer.Serialize(problemDetails);
+        //    await context.Response.WriteAsync(problemDetailsJson);
+        //}
 
         catch (ValidationException ex)
         {
